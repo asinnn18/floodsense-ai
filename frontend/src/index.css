@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #F59E0B; /* Amber/Orange */
+  --color-primary-dark: #D97706;
+  --color-primary-light: #FBBF24;
+  --color-danger: #ef4444;
+  --color-warning: #eab308;
+  --color-success: #10b981;
+  --color-background: #f8fafc; /* Very light slate */
+  --color-card: #ffffff;
+  --color-text-main: #1e293b;
+
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-text-main font-sans;
+  }
+}
+
+.leaflet-container {
+  @apply rounded-xl shadow-xl border border-primary/10;
+  height: 500px;
+  width: 100%;
+}
+
+.glass-panel {
+  @apply bg-card/90 backdrop-blur-md border border-primary/10 rounded-2xl p-6 shadow-lg shadow-primary/5 transition-all hover:shadow-xl;
+}
+
+.glass-panel-dark {
+  @apply bg-primary-dark/90 text-white backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-xl;
+}
+
+.btn-primary {
+  @apply bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-xl font-bold transition-all active:scale-95 shadow-md shadow-primary/30;
+}
+
+.btn-secondary {
+  @apply bg-slate-100 hover:bg-slate-200 text-slate-500 border border-slate-200 px-6 py-3 rounded-xl font-bold transition-all active:scale-95;
+}
+
+.input-field {
+  @apply w-full bg-white border border-primary/20 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-background;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-primary/30 rounded-full hover:bg-primary/50;
+}
