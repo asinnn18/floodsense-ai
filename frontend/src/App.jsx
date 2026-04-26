@@ -30,8 +30,7 @@ const TopNav = ({ user, logout, switchRole }) => {
         {/* Left Side: Logo & Title */}
         <div className="flex items-center gap-4">
           <img 
-            src="https://upload.wikimedia.org/wikipedia/en/thumb/5/5a/Emblem_of_Karnataka.svg/800px-Emblem_of_Karnataka.svg.png" 
-            referrerPolicy="no-referrer"
+            src="/emblem_of_karnataka_stylized_1777159710606.png" 
             alt="Emblem" 
             className="w-12 h-12 object-contain"
           />
@@ -153,7 +152,7 @@ function App() {
 
       {/* Global UI Watermark */}
       <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-0 opacity-[0.02]">
-        <img src="https://upload.wikimedia.org/wikipedia/en/thumb/5/5a/Emblem_of_Karnataka.svg/800px-Emblem_of_Karnataka.svg.png" referrerPolicy="no-referrer" alt="" className="w-[800px] h-[800px] object-contain grayscale" />
+        <img src="/emblem_of_karnataka_stylized_1777159710606.png" alt="" className="w-[800px] h-[800px] object-contain grayscale" />
       </div>
 
       <div className="relative z-10">
@@ -162,8 +161,7 @@ function App() {
         ) : loading ? (
           <div className="h-screen w-screen flex flex-col items-center justify-center pt-20">
             <img 
-              src="https://upload.wikimedia.org/wikipedia/en/thumb/5/5a/Emblem_of_Karnataka.svg/800px-Emblem_of_Karnataka.svg.png" 
-              referrerPolicy="no-referrer"
+              src="/emblem_of_karnataka_stylized_1777159710606.png" 
               alt="Emblem" 
               className="w-20 h-20 mb-6 drop-shadow-md animate-pulse"
             />

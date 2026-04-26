@@ -42,20 +42,19 @@ const LandingPage = () => {
 
       {/* Global UI Watermark */}
       <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-0 opacity-[0.02]">
-        <img src="https://upload.wikimedia.org/wikipedia/en/thumb/5/5a/Emblem_of_Karnataka.svg/800px-Emblem_of_Karnataka.svg.png" referrerPolicy="no-referrer" alt="" className="w-[800px] h-[800px] object-contain grayscale" />
+        <img src="/emblem_of_karnataka_stylized_1777159710606.png" alt="" className="w-[800px] h-[800px] object-contain grayscale" />
       </div>
 
       <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-md p-10 flex flex-col items-center relative z-10 mx-4 border border-slate-100 overflow-hidden">
         
         {/* Exact Watermark inside the card as seen in the mockup */}
         <div className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 opacity-[0.04] pointer-events-none z-0">
-          <img src="https://upload.wikimedia.org/wikipedia/en/thumb/5/5a/Emblem_of_Karnataka.svg/800px-Emblem_of_Karnataka.svg.png" referrerPolicy="no-referrer" alt="watermark" className="w-full h-full object-contain" />
+          <img src="/emblem_of_karnataka_stylized_1777159710606.png" alt="watermark" className="w-full h-full object-contain" />
         </div>
 
         {/* Emblem */}
         <img 
-          src="https://upload.wikimedia.org/wikipedia/en/thumb/5/5a/Emblem_of_Karnataka.svg/800px-Emblem_of_Karnataka.svg.png" 
-          referrerPolicy="no-referrer"
+          src="/emblem_of_karnataka_stylized_1777159710606.png" 
           alt="Government of Karnataka Emblem" 
           className="w-24 h-24 mb-6 object-contain relative z-10"
         />
@@ -64,9 +63,12 @@ const LandingPage = () => {
         <h1 className="text-2xl font-black text-center text-[#1e293b] leading-tight mb-2 uppercase relative z-10">
           {t("FLOOD SENSE AND DRAIN IQ") || "FLOOD SENSE AND DRAIN IQ"}
         </h1>
-        <h2 className="text-[10px] font-bold text-slate-400 tracking-[0.2em] mb-8 uppercase relative z-10">
+        <h2 className="text-[10px] font-bold text-slate-400 tracking-[0.2em] mb-2 uppercase relative z-10">
           {t("NAMMA BENGALURU") || "NAMMA BENGALURU"}
         </h2>
+        <p className="text-xs text-[#F59E0B] font-bold tracking-wide uppercase text-center mb-6 relative z-10">
+          Predict • Prevent • Protect
+        </p>
 
         {/* Language Selector */}
         <div className="w-full mb-6 relative z-10">

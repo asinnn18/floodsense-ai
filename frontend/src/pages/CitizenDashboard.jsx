@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { MapPin, Zap, CloudRain, Wind, Droplets, Activity, FileText } from 'lucide-react'
 import MapDashboard from './MapDashboard'
 import { useTranslation } from 'react-i18next'
@@ -7,8 +7,43 @@ const CitizenDashboard = ({ data, user }) => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('MAP');
 
+  // Chatbot State
+  const [chatInput, setChatInput] = useState('');
+  const [chatHistory, setChatHistory] = useState([
+    { role: 'bot', text: t("Namaskara! I'm FloodBot. Ask me about flood risks in Namma Bengaluru, safe routes, or drain status.") }
+  ]);
+  const [isTyping, setIsTyping] = useState(false);
+  const chatEndRef = useRef(null);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatHistory, isTyping]);
+
+  const handleChat = async (e) => {
+    e.preventDefault();
+    if (!chatInput.trim()) return;
+
+    const userMsg = chatInput;
+    setChatInput('');
+    setChatHistory(prev => [...prev, { role: 'user', text: userMsg }]);
+    setIsTyping(true);
+
+    try {
+      const response = await fetch('http://127.0.0.1:5000/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMsg })
+      });
+      const resData = await response.json();
+      setChatHistory(prev => [...prev, { role: 'bot', text: resData.response }]);
+    } catch (err) {
+      setChatHistory(prev => [...prev, { role: 'bot', text: "Error connecting to AI Server." }]);
+    }
+    setIsTyping(false);
+  };
+
   return (
-    <div className="flex flex-col gap-6 w-full">
+    <div className="flex flex-col gap-6 w-full pb-8">
       
       {/* Top Stats Row */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 w-full">
@@ -119,10 +154,41 @@ const CitizenDashboard = ({ data, user }) => {
               </button>
             ))}
           </div>
-          <div className="flex-1 w-full bg-slate-50 relative p-4">
-            {/* The MapDashboard component handles Leaflet rendering inside this container */}
-            <div className="w-full h-full rounded-2xl overflow-hidden border border-slate-200 shadow-inner">
-               <MapDashboard data={data} />
+          <div className="flex-1 w-full bg-slate-50 relative p-4 overflow-hidden">
+            <div className="w-full h-full rounded-2xl overflow-hidden border border-slate-200 shadow-inner bg-white">
+               {activeTab === 'MAP' && <MapDashboard data={data} />}
+               
+               {activeTab === 'SAFE ROUTING' && (
+                 <div className="p-6 h-full flex flex-col items-center justify-center text-center">
+                   <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6 animate-pulse">
+                     <MapPin size={40} />
+                   </div>
+                   <h2 className="text-3xl font-black text-slate-800 mb-4">{t("AI Safe Routing Active")}</h2>
+                   <p className="text-slate-500 max-w-md mb-8">{t("GPS navigation is currently routing you away from the active high-risk flood zones.")}</p>
+                   <button className="bg-[#F59E0B] hover:bg-amber-600 text-white px-8 py-3 rounded-xl font-bold shadow-md active:scale-95 transition-all">
+                     {t("Start Navigation")}
+                   </button>
+                 </div>
+               )}
+
+               {activeTab === 'LIVE ANALYTICS' && (
+                 <div className="p-6 h-full flex flex-col bg-slate-900 text-slate-300">
+                   <h3 className="text-white font-bold mb-4 uppercase tracking-wider flex items-center gap-2">
+                     <Activity size={16} className="text-green-400" /> {t("Live IoT Telemetry")}
+                   </h3>
+                   <div className="flex-1 overflow-y-auto font-mono text-xs space-y-2 pr-2">
+                     {data.raw_iot_feed?.map((log, i) => (
+                       <div key={i} className="flex flex-wrap gap-x-4 gap-y-1 border-b border-slate-800 pb-2">
+                         <span className="text-slate-500 w-20">{new Date(log.timestamp).toLocaleTimeString()}</span>
+                         <span className="text-blue-400 w-24">[{log.drain_id}]</span>
+                         <span className="text-emerald-400 w-28">Flow: {log.flow_lps} L/s</span>
+                         <span className="text-amber-400 w-24">Lvl: {log.level_cm} cm</span>
+                         <span className="text-slate-600">MAC: {log.mac}</span>
+                       </div>
+                     ))}
+                   </div>
+                 </div>
+               )}
             </div>
           </div>
         </div>
@@ -152,28 +218,107 @@ const CitizenDashboard = ({ data, user }) => {
             </div>
           </div>
 
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm flex flex-col h-[400px] overflow-hidden relative">
-             <div className="p-4 border-b border-slate-100 flex items-center gap-2">
-               <span className="text-2xl">🤖</span>
-               <h3 className="font-bold text-slate-800">{t("FloodBot AI")}</h3>
+          {/* Interactive Gemini-style Chatbot */}
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm flex flex-col h-[450px] overflow-hidden relative">
+             <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+               <div className="flex items-center gap-2">
+                 <span className="text-2xl">🤖</span>
+                 <h3 className="font-bold text-slate-800">{t("FloodBot AI")}</h3>
+               </div>
+               <span className="text-[10px] bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-bold">Powered by Gemini</span>
              </div>
+             
              <div className="flex-1 p-4 overflow-y-auto bg-slate-50 flex flex-col gap-4">
-                <div className="bg-white border border-slate-200 p-4 rounded-2xl rounded-tl-none shadow-sm text-sm text-slate-600">
-                  <span className="text-xl mr-2">🙏</span> {t("Namaskara! I'm FloodBot. Ask me about flood risks in Namma Bengaluru, safe routes, or drain status.")}
-                </div>
+               {chatHistory.map((msg, idx) => (
+                 <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                   <div className={`max-w-[85%] p-3 rounded-2xl text-sm shadow-sm ${
+                     msg.role === 'user' 
+                      ? 'bg-[#F59E0B] text-white rounded-br-none' 
+                      : 'bg-white border border-slate-200 text-slate-700 rounded-tl-none whitespace-pre-line leading-relaxed'
+                   }`}>
+                     {msg.text}
+                   </div>
+                 </div>
+               ))}
+               {isTyping && (
+                 <div className="flex justify-start">
+                   <div className="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-none shadow-sm flex gap-1 items-center">
+                     <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></div>
+                     <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                     <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                   </div>
+                 </div>
+               )}
+               <div ref={chatEndRef} />
              </div>
-             <div className="p-4 bg-white border-t border-slate-100">
-                <div className="relative">
-                  <input type="text" placeholder={t("Ask about Bengaluru floods...")} className="w-full bg-slate-50 border border-slate-200 rounded-full py-3 px-4 text-sm focus:outline-none focus:border-[#F59E0B]" />
-                  <button className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#F59E0B] rounded-full flex items-center justify-center text-white">
-                    <Zap size={14} />
+             
+             <div className="p-3 bg-white border-t border-slate-100">
+                <form onSubmit={handleChat} className="relative">
+                  <input 
+                    type="text" 
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    placeholder={t("Ask what you should do...")} 
+                    className="w-full bg-slate-50 border border-slate-200 rounded-full py-3 pl-4 pr-12 text-sm focus:outline-none focus:border-[#F59E0B]" 
+                  />
+                  <button type="submit" disabled={isTyping || !chatInput.trim()} className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#F59E0B] rounded-full flex items-center justify-center text-white disabled:opacity-50 hover:bg-amber-600 transition-colors">
+                    <Zap size={14} className="fill-current" />
                   </button>
-                </div>
+                </form>
              </div>
           </div>
         </div>
 
       </div>
+
+      {/* Bottom Citizen Action Bar */}
+      <div className="bg-white rounded-3xl border border-slate-200 p-4 shadow-sm w-full mt-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <button className="bg-red-50 hover:bg-red-100 border border-red-200 rounded-2xl p-4 flex items-center justify-center gap-3 transition-all active:scale-95 group">
+            <div className="w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center group-hover:animate-pulse">
+              <Zap size={20} className="fill-current" />
+            </div>
+            <div className="text-left">
+              <div className="font-black text-red-700 tracking-wide uppercase">{t("SOS EMERGENCY")}</div>
+              <div className="text-xs text-red-500 font-medium">{t("Dispatch NDRF Rescue")}</div>
+            </div>
+          </button>
+
+          <button className="bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-2xl p-4 flex items-center justify-center gap-3 transition-all active:scale-95 cursor-pointer">
+            <div className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center">
+              <FileText size={20} />
+            </div>
+            <div className="text-left">
+              <div className="font-bold text-blue-700 uppercase">{t("REPORT BLOCKAGE")}</div>
+              <div className="text-xs text-blue-500 font-medium">{t("Upload Photo Evidence")}</div>
+            </div>
+          </button>
+
+          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-center gap-3">
+            <div className="w-10 h-10 bg-emerald-500 text-white rounded-full flex items-center justify-center">
+              <CheckCircleIcon size={20} />
+            </div>
+            <div className="text-left">
+              <div className="font-bold text-emerald-700 uppercase">{t("AI VERIFICATION")}</div>
+              <div className="text-xs text-emerald-600 font-medium">{t("Auto-Updating Map")}</div>
+            </div>
+          </div>
+
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center justify-center gap-3">
+            <div className="w-10 h-10 bg-amber-500 text-white rounded-full flex items-center justify-center relative">
+              <Activity size={20} />
+              <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full animate-ping"></span>
+            </div>
+            <div className="text-left">
+              <div className="font-bold text-amber-700 uppercase">{t("AUTHORITY ALERT")}</div>
+              <div className="text-xs text-amber-600 font-medium">{t("BBMP Dashboard Linked")}</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
     </div>
   )
 }

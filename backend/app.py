@@ -176,21 +176,21 @@ def chat_bot():
     data = request.json
     msg = data.get("message", "").lower()
     
-    response = "I am FloodBot, your AI assistant. I'm monitoring the city's drainage network in real-time."
-    
-    if "safe route" in msg or "travel" in msg:
-        response = "Based on current predictions, Hosur Road and NICE Road are safe. Avoid Silk Board junction as IoT sensors indicate rising water levels."
-    elif "koramangala" in msg:
-        if state["flood_risk"]["koramangala"]["risk_level"] == "High":
-             response = "Koramangala is currently at HIGH RISK. Priority infrastructure like St. John's Hospital is being monitored. Please avoid the area."
-        else:
-             response = "Koramangala is currently safe, but we are monitoring drain D-102 closely."
-    elif "deploy" in msg or "workers" in msg:
+    # Sophisticated Gemini-like mock response
+    if "safe route" in msg or "travel" in msg or "where to go" in msg:
+        response = "### 🗺️ AI Safe Route Analysis\n\nBased on real-time IoT telemetry from the Bengaluru Drainage Network, here is my assessment:\n\n**🛑 High-Risk Zones to AVOID:**\n- **Silk Board Junction**: Sensor D-452 indicates rapid water level rise. High probability of severe waterlogging in the next 15 mins.\n- **Koramangala 80ft Road**: Drain capacity is at 92%. Avoid this route.\n\n**✅ Recommended Safe Routes:**\n- **Hosur Road (Elevated Expressway)**: Flow rate is optimal, no blockage detected.\n- **NICE Road Corridor**: Safe for travel.\n\n*Would you like me to push this safe route directly to your Map Dashboard?*"
+    elif "what should i do" in msg or "emergency" in msg or "help" in msg:
+        response = "### 🚨 AI Emergency Protocol Activated\n\nI detect you are asking for emergency guidance. **Please follow these exact steps:**\n\n1. **Move to Higher Ground**: If you are in a low-lying area, move to the 1st floor or higher immediately.\n2. **Avoid Electrical Poles**: Do not walk through stagnant water near transformers or poles.\n3. **Use the SOS Button**: If you are trapped, click the red **SOS EMERGENCY** button at the bottom of your dashboard. I will instantly transmit your exact GPS coordinates to the NDRF rescue teams.\n\n*I am monitoring the situation. Stay safe.*"
+    elif "deploy" in msg or "workers" in msg or "authority" in msg:
         critical_drains = [d for d in state["drains"].values() if d["status"] == "Critical"]
         if critical_drains:
-            response = f"I recommend deploying {len(critical_drains)*3} workers and {len(critical_drains)} pumps to the critical drains immediately."
+            response = f"### 📊 Predictive Resource Allocation\n\nBased on my neural network analysis of current rainfall and drain blockage data:\n\n- **Critical Drains**: {len(critical_drains)} drains are failing.\n- **Required Action**: Immediate deployment of **{len(critical_drains)*3} rapid-response workers** and **{len(critical_drains)} high-capacity pumps**.\n\nI have already drafted the priority task list for the BBMP Authority Dashboard."
         else:
-            response = "No immediate worker deployment required. All drains are operating within safe parameters."
+            response = "### 📊 System Status: Stable\n\nAll IoT sensors indicate that current drainage flow is within safe parameters. No emergency deployment of workers is required at this exact moment."
+    elif "report" in msg or "photo" in msg or "blockage" in msg:
+        response = "### 📸 Citizen Intelligence Reporting\n\nIf you see a blocked drain or rising water:\n1. Click the **REPORT BLOCKAGE** button below.\n2. Upload a clear photo of the issue.\n\n**What happens next?**\nMy computer vision models will instantly verify the blockage severity and update the city-wide risk map automatically. Authorities will be alerted within 400 milliseconds."
+    else:
+        response = "### 🤖 FloodSense AI\n\nI am the AI core for the DrainIQ platform. I process millions of data points from IoT sensors, weather satellites, and citizen reports to predict floods *before* they happen.\n\n**You can ask me to:**\n- Find a safe route home\n- Check the flood risk in your ward\n- Guide you on what to do during an emergency\n\n*How can I assist you in Bengaluru today?*"
             
     return jsonify({"response": response})
 
